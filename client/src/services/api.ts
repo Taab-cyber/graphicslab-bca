@@ -1,4 +1,5 @@
-const API_BASE = '/api';
+// Use environment variable if provided (production), fallback to standard proxy/relative path
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('graphicslab_token');
