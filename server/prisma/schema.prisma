@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(cuid())
+  name        String
+  email       String        @unique
+  password    String
+  avatar      String        @default("robot1")
+  xp          Int           @default(0)
+  level       Int           @default(1)
+  badges      String[]      @default([])
+  streak      Int           @default(0)
+  isAdmin     Boolean       @default(false)
+  lastLogin   DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+  scores      Score[]
+  activities  ActivityLog[]
+  friends     Friendship[]  @relation("userFriends")
+  friendsOf   Friendship[]  @relation("friendOf")
+}
+
+model Score {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  program     String
+  type        String   @default("quiz") // "quiz" or "challenge"
+  score       Int
+  attempts    Int      @default(1)
+  completedAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([program])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // "quiz", "puzzle", "challenge", "viewed"
+  program   String
+  xpEarned  Int
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("userFriends", fields: [userId], references: [id])
+  friendId  String
+  friend    User     @relation("friendOf", fields: [friendId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, friendId])
+  @@index([userId])
+  @@index([friendId])
+}
