@@ -85,7 +85,7 @@ router.get('/my', authMiddleware, async (req: AuthRequest, res: Response): Promi
 router.get('/program/:program', authMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const scores = await prisma.score.findMany({
-      where: { userId: req.userId, program: req.params.program },
+      where: { userId: req.userId, program: req.params.program as string },
       orderBy: { completedAt: 'desc' },
     });
 
